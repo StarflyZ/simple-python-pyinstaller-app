@@ -6,13 +6,15 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'python -m py_compile sources/add2vals.py sources/calc.py'
+                sh 'python -m venv venv'
+                sh 'source venv/bin/activate && python -m py_compile sources/add2vals.py sources/calc.py'
                 stash(name: 'compiled-results', includes: 'sources/*.py*')
             }
         }
         stage('Test') {
             steps {
-                sh 'py.test --junit-xml test-reports/results.xml sources/test_calc.py'
+                sh 'source venv/bin/activate && pip install pytest'
+                sh 'source venv/bin/activate && py.test --junit-xml test-reports/results.xml sources/test_calc.py'
             }
             post {
                 always {
@@ -22,7 +24,7 @@ pipeline {
         }
         stage('Deliver') { 
             steps {
-                sh "pyinstaller --onefile sources/add2vals.py" 
+                sh 'source venv/bin/activate && pyinstaller --onefile sources/add2vals.py'
             }
             post {
                 success {
