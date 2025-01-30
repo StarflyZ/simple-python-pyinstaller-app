@@ -13,7 +13,10 @@ pipeline {
         }
         stage('Test') {
             steps {
-                sh 'source venv/bin/activate && pip install pytest'
+                sh '''
+                    apt-get update
+                    apt-get install -y python3-pytest
+                '''
                 sh 'source venv/bin/activate && py.test --junit-xml test-reports/results.xml sources/test_calc.py'
             }
             post {
