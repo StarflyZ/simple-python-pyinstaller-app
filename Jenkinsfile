@@ -1,39 +1,24 @@
 pipeline {
-    agent any
-    options {
-        skipStagesAfterUnstable()
-    }
-    environment {
-        VENV_DIR = "venv"
-    }
+    agent none
     stages {
-        stage('Setup') {
-            steps {
-                sh '''
-                    apt-get update
-                    apt-get install -y python3 python3-pip python3-venv
-                    python3 -m venv ${VENV_DIR}
-                    source ${VENV_DIR}/bin/activate
-                    pip install --upgrade pip
-                    pip install pytest --break-system-packages
-                '''
-            }
-        }
         stage('Build') {
+            agent {
+                docker {
+                    image 'python:2-alpine'
+                }
+            }
             steps {
-                sh '''
-                    source ${VENV_DIR}/bin/activate
-                    python -m py_compile sources/add2vals.py sources/calc.py
-                '''
-                stash(name: 'compiled-results', includes: 'sources/*.py*')
+                sh 'python -m py_compile sources/add2vals.py sources/calc.py'
             }
         }
         stage('Test') {
+            agent {
+                docker {
+                    image 'qnib/pytest'
+                }
+            }
             steps {
-                sh '''
-                    source ${VENV_DIR}/bin/activate
-                    pytest --junit-xml test-reports/results.xml sources/test_calc.py
-                '''
+                sh 'py.test --verbose --junit-xml test-reports/results.xml sources/test_calc.py'
             }
             post {
                 always {
@@ -42,11 +27,13 @@ pipeline {
             }
         }
         stage('Deliver') {
+            agent {
+                docker {
+                    image 'cdrx/pyinstaller-linux:python2'
+                }
+            }
             steps {
-                sh '''
-                    source ${VENV_DIR}/bin/activate
-                    pyinstaller --onefile sources/add2vals.py
-                '''
+                sh 'pyinstaller --onefile sources/add2vals.py'
             }
             post {
                 success {
