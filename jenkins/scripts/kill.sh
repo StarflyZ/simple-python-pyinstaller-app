@@ -10,4 +10,4 @@ if [ -f .pidfile ]; then
     echo 'Application has been stopped.'
 else
     echo 'No running application found.'
-
+fi
