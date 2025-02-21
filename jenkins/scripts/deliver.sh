@@ -1,9 +1,9 @@
 #!/usr/bin/env sh
 
-echo 'Building standalone executable with PyInstaller...'
+echo 'Starting Python application deployment...'
 
 set -x
-# Buat virtual environment jika belum ada
+# Membuat virtual environment jika belum ada
 if [ ! -d "venv" ]; then
     python -m venv venv
 fi
@@ -11,22 +11,18 @@ fi
 # Aktifkan virtual environment
 . venv/bin/activate
 
-# Install dependencies
+# Install dependencies jika ada
 pip install --upgrade pip
-pip install pyinstaller
-
-# Build executable dengan PyInstaller
-pyinstaller --onefile sources/add2vals.py
-
+pip install -r requirements.txt
 set +x
 
-echo 'The executable has been built and is available in the "dist/" directory.'
-echo 'You can download it from Jenkins workspace.'
+echo 'Running Python application...'
 
-# Jalankan aplikasi sebagai service di background
-set -x
-./dist/add2vals &  
+# Jalankan aplikasi dengan output ke log & tampilkan di Jenkins
+python app.py 2>&1 | tee app.log &
+
+# Simpan PID aplikasi
 echo $! > .pidfile
-set +x
 
-echo 'Application is running in the background. Waiting for user confirmation before stopping...'
+echo 'Python application is running! Logs:'
+tail -f app.log &  # Menampilkan log real-time di Jenkins
