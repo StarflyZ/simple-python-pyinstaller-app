@@ -27,6 +27,7 @@ pipeline {
             }
         }
         stage('Deploy') {
+            agent any
             steps {
                 sh './jenkins/scripts/deliver.sh'
                 input message: 'Sudah selesai menggunakan aplikasi? (Klik "Proceed" untuk mengakhiri)'
