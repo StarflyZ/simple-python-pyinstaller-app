@@ -29,10 +29,11 @@ pipeline {
         stage('Deploy') {
             agent any
             steps {
-                sh 'chmod +x jenkins/scripts/deliver.sh jenkins/scripts/kill.sh'  // Tambahkan ini!
-                sh './jenkins/scripts/deliver.sh'
-                input message: 'Sudah selesai menggunakan aplikasi? (Klik "Proceed" untuk mengakhiri)'
-                sh './jenkins/scripts/kill.sh'
+                sh './jenkins/scripts/deliver.sh'  // Menjalankan aplikasi
+                echo 'Aplikasi berjalan selama 1 menit...'
+                sh 'sleep 60'  // Menunggu 1 menit sebelum melanjutkan
+                echo 'Waktu habis, aplikasi akan dihentikan...'
+                sh './jenkins/scripts/kill.sh'  // Menghentikan aplikasi
             }
         }
     }
