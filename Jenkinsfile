@@ -30,7 +30,7 @@ pipeline {
             agent {
                 docker {
                     image 'docker:24.0.2' // Gunakan versi terbaru sesuai kebutuhan
-                    args '--privileged -v /var/run/docker.sock:/var/run/docker.sock' // Akses Docker Host
+                    args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // Akses Docker Host
                 }
             }
             steps {
@@ -39,6 +39,9 @@ pipeline {
                     
                     // Build Docker Image untuk aplikasi
                     sh '''
+                    mkdir -p /tmp/docker-build
+                    cp -r * /tmp/docker-build/
+                    cd /tmp/docker-build
                     docker build -t my_app_image .
                     '''
 
