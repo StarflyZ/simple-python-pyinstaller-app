@@ -29,6 +29,7 @@ pipeline {
         stage('Deploy') {
             agent any
             steps {
+                sh 'chmod +x jenkins/scripts/deliver.sh jenkins/scripts/kill.sh'  // Tambahkan ini!
                 sh './jenkins/scripts/deliver.sh'
                 input message: 'Sudah selesai menggunakan aplikasi? (Klik "Proceed" untuk mengakhiri)'
                 sh './jenkins/scripts/kill.sh'
