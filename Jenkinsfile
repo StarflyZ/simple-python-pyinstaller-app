@@ -29,7 +29,8 @@ pipeline {
         stage('Deploy') {
             agent any
             steps {
-                sh './jenkins/scripts/deliver.sh'  // Menjalankan aplikasi
+                sh 'chmod +x jenkins/scripts/deliver.sh jenkins/scripts/kill.sh'
+                sh './jenkins/scripts/deliver.sh'
                 echo 'Aplikasi berjalan selama 1 menit...'
                 sh 'sleep 60'  // Menunggu 1 menit sebelum melanjutkan
                 echo 'Waktu habis, aplikasi akan dihentikan...'
