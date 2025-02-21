@@ -39,9 +39,6 @@ pipeline {
                     
                     // Build Docker Image untuk aplikasi
                     sh '''
-                    mkdir -p /tmp/docker-build
-                    cp -r * /tmp/docker-build/
-                    cd /tmp/docker-build
                     docker build -t my_app_image .
                     '''
 
