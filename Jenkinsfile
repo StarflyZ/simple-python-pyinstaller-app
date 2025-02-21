@@ -26,41 +26,11 @@ pipeline {
                 }
             }
         }
-         stage('Deploy') {
-            agent {
-                docker {
-                    image 'docker:24.0.2' // Gunakan versi terbaru sesuai kebutuhan
-                    args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // Akses Docker Host
-                }
-            }
+        stage('Deploy') {
             steps {
-                script {
-                    echo 'Starting Deployment...'
-                    
-                    // Build Docker Image untuk aplikasi
-                    sh '''
-                    docker build -t my_app_image .
-                    '''
-
-                    // Hentikan container jika sudah berjalan
-                    sh '''
-                    docker stop my_app_container || true
-                    docker rm my_app_container || true
-                    '''
-
-                    // Jalankan container di port 8081 (agar tidak bentrok dengan Jenkins)
-                    sh '''
-                    docker run -d --name my_app_container -p 8081:80 my_app_image
-                    '''
-                }
-            }
-            post {
-                success {
-                    echo 'Deployment successful! App is running on port 8081'
-                }
-                failure {
-                    echo 'Deployment failed!'
-                }
+                sh './jenkins/scripts/deliver.sh'
+                input message: 'Sudah selesai menggunakan aplikasi? (Klik "Proceed" untuk mengakhiri)'
+                sh './jenkins/scripts/kill.sh'
             }
         }
     }
